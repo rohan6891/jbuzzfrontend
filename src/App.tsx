@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Bell, RefreshCw, ExternalLink, Search, AlertCircle, Filter, Calendar, Tag } from 'lucide-react';
+import { Bell, RefreshCw, ExternalLink, Search, AlertCircle } from 'lucide-react';
 import { fetchNotifications, triggerManualScrape } from './api/scraper';
 import { Notification } from './types';
 import NotificationCard from './components/NotificationCard';
 import LatestPosts from './components/LatestPosts';
 import Loader from './components/Loader';
 import ErrorMessage from './components/ErrorMessage';
-import { formatDistanceToNow, format } from 'date-fns';
+import { formatDistanceToNow } from 'date-fns';
+import CONFIG from './config'; // <-- import config
 
 function App() {
   const [activeTab, setActiveTab] = useState<'jntuk' | 'jntuh'>('jntuk');
@@ -18,8 +19,6 @@ function App() {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [refreshing, setRefreshing] = useState<boolean>(false);
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  const [dateFilter, setDateFilter] = useState<string>('all');
 
   useEffect(() => {
     fetchNotificationsForCollege(activeTab);
@@ -30,6 +29,7 @@ function App() {
     setError(null);
 
     try {
+      // Use config for API endpoint if needed
       const response = await fetchNotifications(college);
       const collegeData = response[college];
       setLatestPosts(collegeData.latest);
@@ -48,6 +48,7 @@ function App() {
   const handleRefresh = async () => {
     setRefreshing(true);
     try {
+      // Use config for API endpoint if needed
       const response = await triggerManualScrape(activeTab);
       const collegeData = response.data[activeTab];
       setLatestPosts(collegeData.latest);
@@ -61,14 +62,6 @@ function App() {
       setRefreshing(false);
     }
   };
-
-  const categories = ['all', 'Exam', 'Result', 'Notice'];
-  const dateFilters = [
-    { value: 'all', label: 'All Time' },
-    { value: 'today', label: 'Today' },
-    { value: 'week', label: 'This Week' },
-    { value: 'month', label: 'This Month' }
-  ];
 
   // Combine notifications and results for the main list
   const combinedNotifications = [...notifications, ...results];
@@ -84,7 +77,7 @@ function App() {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
               <Bell className="h-6 w-6" />
-              <h1 className="text-2xl font-bold">JBuzz</h1>
+              <h1 className="text-2xl font-bold">{CONFIG.APP.NAME}</h1>
             </div>
             <div className="flex items-center space-x-4">
               {lastUpdated && (
@@ -118,7 +111,7 @@ function App() {
                   }`}
                   onClick={() => setActiveTab('jntuk')}
                 >
-                  JNTUK Notifications
+                  {CONFIG.COLLEGES.JNTUK.NAME} Notifications
                 </button>
                 <button
                   className={`px-6 py-3 font-medium text-sm rounded-t-lg ${
@@ -128,7 +121,7 @@ function App() {
                   }`}
                   onClick={() => setActiveTab('jntuh')}
                 >
-                  JNTUH Notifications
+                  {CONFIG.COLLEGES.JNTUH.NAME} Notifications
                 </button>
               </div>
             </div>
@@ -159,8 +152,8 @@ function App() {
                 <AlertCircle className="h-12 w-12 text-neutral-400 mx-auto mb-4" />
                 <h3 className="text-lg font-medium text-neutral-900">No notifications found</h3>
                 <p className="mt-2 text-sm text-neutral-500">
-                  {searchQuery 
-                    ? "Try adjusting your search filters" 
+                  {searchQuery
+                    ? "Try adjusting your search filters"
                     : "Check back later for updates"}
                 </p>
               </div>
@@ -182,11 +175,11 @@ function App() {
       <footer className="bg-primary-100 border-t border-primary-200 mt-10">
         <div className="container mx-auto px-4 py-6">
           <p className="text-center text-neutral-600 text-sm">
-            This application scrapes notifications from official JNTUK and JNTUH websites.
+            This application scrapes notifications from official {CONFIG.COLLEGES.JNTUK.NAME} and {CONFIG.COLLEGES.JNTUH.NAME} websites.
             <br />
-            <a 
-              href={activeTab === 'jntuk' ? 'https://jntuk.edu.in' : 'https://jntuh.ac.in'} 
-              target="_blank" 
+            <a
+              href={activeTab === 'jntuk' ? CONFIG.COLLEGES.JNTUK.OFFICIAL_URL : CONFIG.COLLEGES.JNTUH.OFFICIAL_URL}
+              target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center text-primary-600 hover:underline"
             >

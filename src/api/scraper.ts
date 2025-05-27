@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { Notification } from '../types';
+import CONFIG from '../config';
 
 interface ScrapeResponse {
   [college: string]: {
@@ -18,7 +19,8 @@ interface ManualScrapeResponse {
 
 export const fetchNotifications = async (college: 'jntuk' | 'jntuh'): Promise<ScrapeResponse> => {
   try {
-    const response = await axios.get<ScrapeResponse>(`http://localhost:5000/api/notifications/${college}`);
+    const url = CONFIG.API.NOTIFICATIONS(college);
+    const response = await axios.get<ScrapeResponse>(url);
     return response.data;
   } catch (error) {
     console.error(`Error fetching notifications for ${college}:`, error);
@@ -28,7 +30,8 @@ export const fetchNotifications = async (college: 'jntuk' | 'jntuh'): Promise<Sc
 
 export const triggerManualScrape = async (college: 'jntuk' | 'jntuh'): Promise<ManualScrapeResponse> => {
   try {
-    const response = await axios.post<ManualScrapeResponse>(`http://localhost:5000/api/scrape/${college}`);
+    const url = CONFIG.API.SCRAPE(college);
+    const response = await axios.post<ManualScrapeResponse>(url);
     return response.data;
   } catch (error) {
     console.error(`Error triggering manual scrape for ${college}:`, error);
