@@ -7,7 +7,7 @@ import LatestPosts from './components/LatestPosts';
 import Loader from './components/Loader';
 import ErrorMessage from './components/ErrorMessage';
 import { formatDistanceToNow } from 'date-fns';
-import CONFIG from './config'; // <-- import config
+import CONFIG from './config';
 
 function App() {
   const [activeTab, setActiveTab] = useState<'jntuk' | 'jntuh'>('jntuk');
@@ -29,16 +29,17 @@ function App() {
     setError(null);
 
     try {
-      // Use config for API endpoint if needed
       const response = await fetchNotifications(college);
       const collegeData = response[college];
-      setLatestPosts(collegeData.latest);
-      setNotifications(collegeData.notifications);
-      setResults(collegeData.results);
+      console.log('Initial fetch response:', collegeData);
+      setLatestPosts(collegeData.latest || []);
+      setNotifications(collegeData.notifications || []);
+      setResults(collegeData.results || []);
       setLastUpdated(collegeData.lastScrape ? new Date(collegeData.lastScrape) : null);
+      console.log('Updated latestPosts:', collegeData.latest || []);
     } catch (err) {
       setError('Failed to fetch notifications. Please try again later.');
-      console.error(err);
+      console.error('Error fetching notifications:', err);
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -48,16 +49,17 @@ function App() {
   const handleRefresh = async () => {
     setRefreshing(true);
     try {
-      // Use config for API endpoint if needed
       const response = await triggerManualScrape(activeTab);
       const collegeData = response.data[activeTab];
-      setLatestPosts(collegeData.latest);
-      setNotifications(collegeData.notifications);
-      setResults(collegeData.results);
+      console.log('Manual scrape response:', collegeData);
+      setLatestPosts(collegeData.latest || []);
+      setNotifications(collegeData.notifications || []);
+      setResults(collegeData.results || []);
       setLastUpdated(collegeData.lastScrape ? new Date(collegeData.lastScrape) : null);
+      console.log('Updated latestPosts after manual scrape:', collegeData.latest || []);
     } catch (err) {
       setError('Failed to refresh notifications. Please try again later.');
-      console.error(err);
+      console.error('Error during manual scrape:', err);
     } finally {
       setRefreshing(false);
     }
@@ -167,7 +169,13 @@ function App() {
           </div>
 
           <div className="lg:w-80 shrink-0">
-            <LatestPosts notifications={latestPosts} />
+            {loading && !refreshing ? (
+              <div className="bg-white rounded-lg shadow-md border border-neutral-100 p-4">
+                <Loader />
+              </div>
+            ) : (
+              <LatestPosts notifications={latestPosts} />
+            )}
           </div>
         </div>
       </main>

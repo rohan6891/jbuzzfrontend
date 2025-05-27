@@ -8,6 +8,8 @@ interface LatestPostsProps {
 }
 
 const LatestPosts: React.FC<LatestPostsProps> = ({ notifications }) => {
+  console.log('LatestPosts received notifications:', notifications);
+
   return (
     <div className="bg-white rounded-lg shadow-md border border-neutral-100 p-4">
       <h2 className="text-lg font-semibold text-neutral-900 mb-4 flex items-center">
