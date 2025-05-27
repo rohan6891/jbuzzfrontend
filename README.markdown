@@ -50,7 +50,3 @@ The application is live at:
 ## Screenshot
 Below is a screenshot of the application:  
 ![Application Screenshot](./screenshot.png)  
-*Replace `path/to/screenshot.png` with the actual path to your screenshot after adding it to your repository (e.g., `images/screenshot.png`). To add the image: take a screenshot of the website, save it as `screenshot.png`, place it in an `images` folder in your repository, and update the path accordingly.*
-
-## Contact
-For any questions, reach out to [Your Name] at [your-email@example.com].
